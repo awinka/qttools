@@ -2,33 +2,41 @@
 
 ## Datastructures
 - `DBSparse`
-	- `from_sparray(sparray, blocksizes: np.ndarray, stackshape=(1,), densify=None, pinned=False)`
-	- `to_dense() -> np.ndarray`
-	- `zeros_like(dbsparse) -> DBSparse`
-	- `get_block(i, j, dense=False) -> np.ndarray`
-	- `set_block(i, j, block: np.ndarray)`
-	- `block_diagonal(offset, dense=False) -> list[sparray] | list[np.ndarray]`
-	- `diagonal() -> np.ndarray`
-	- `local_transpose(copy=False)`
-	- `distributed_transpose()`
-	- `__iadd__(self, other)`
-	- `__imul__(self, other)`
-	- `__neg__(self)`
-	- `__matmul__`
+	- `from_sparray(self, a: sp.sparray, blocksizes: np.ndarray, stackshape=(1,), densify_blocks=None, pinned=False) -> None`
+	- `to_dense(self) -> np.ndarray`
+	- `zeros_like(self, a: DBSparse) -> DBSparse`
+	- `block_diagonal(self, offset: int=0, dense: bool=False) -> list[sparray] | list[np.ndarray]`
+	- `diagonal(self) -> np.ndarray`
+	- `local_transpose(self, copy=False)`
+	- `distributed_transpose(self)`
+	- `__setitem__(self, idx: tuple[int, int], block: np.ndarray) -> None`
+	- `__getitem__(self, idx: tuple[int, int]) -> np.ndarray | sparray`
+	- `__iadd__(self, other) -> self`
+	- `__imul__(self, other) -> self`
+	- `__neg__(self) -> self`
+	- `__matmul__(self, other) -> DBSparse`
+    - `num_blocks(self) -> np.uint`
+    - `block_offsets(self) -> np.uint`
+    - `stack_shape(self) -> np.uint`
+    - `shape(self) -> np.uint`
+    - `nzz(self) -> np.uint`
+	- `set_return_dense(self) -> None`
+	- `return_dense(self) -> bool`
 
-
-## `Solver`
-- `selected_inv(a: DBSparse, out=None, **kwargs) -> None | DBSparse`
-- `selected_solve(a: DBSparse , sigma_lesser: DBSparse, sigma_greater: DBSparse, out: tuple | None = None, return_retarded: bool=False  **kwargs) -> None | tuple`
+## Green's function solver
+- `Solver`
+	- `selected_inv(a: DBSparse, out=None, **kwargs) -> None | DBSparse`
+	- `selected_solve(a: DBSparse , sigma_lesser: DBSparse, sigma_greater: DBSparse, out: tuple | None = None, return_retarded: bool=False  **kwargs) -> None | tuple`
 
 Example:
-```
+```python
 solver = RGF(config.solver)
 x = solver.selected_inv(a)
 ```
 
-## `OBC`
-- `__call__(self, a_ii, a_ij, a_ji, contact, **kwargs)`
+## Open Boundary Conditions
+- `OBC`
+	- `__call__(self, a_ii, a_ij, a_ji, contact, **kwargs)`
 
 Example:
 ```
@@ -40,9 +48,9 @@ g_surface = obc(a_ii, a_ij, a_ji, contact="left")
 - `fftconvolve(a: DBSparse, b: DBSparse, out=None) -> None | DBSparse`
 - `fftcorrelate(a: DBSparse, b: DBSparse) -> None | DBSparse`
 
-
-## Poisson
-- `__call__(self, density)`
+## Poisson solvers
+- `PoissonSolver`
+	- `__call__(self, density)`
 
 Example:
 ```python
